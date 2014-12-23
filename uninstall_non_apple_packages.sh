@@ -3,7 +3,7 @@ for p in $(pkgutil --pkgs | grep -v '^com\.apple\.pkg\.')
 do read -p "Delete $p? [yN] " yn
    [ "$yn" != "y" ] && continue
 
-   cd /$(pkgutil --pkg-info $p | awk '/^location: (.*)/ { print $2 }')
+   cd /"$(pkgutil --pkg-info $p | perl -ne '/^location: (.*)/ && print $1')"
    echo $PWD
    
    pkgutil --only-files --files $p | while read f
