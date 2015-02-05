@@ -1,5 +1,5 @@
 
-for p in $(pkgutil --pkgs | grep -v '^com\.apple\.pkg\.')
+for p in $(pkgutil --pkgs | grep -v '^com\.apple\.')
 do read -p "Delete $p? [yN] " yn
    [ "$yn" != "y" ] && continue
 
