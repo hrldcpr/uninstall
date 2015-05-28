@@ -1,17 +1,24 @@
 
 for p in $(pkgutil --pkgs | grep -v '^com\.apple\.')
-do read -p "Delete $p? [yN] " yn
-   [ "$yn" != "y" ] && continue
+do read -p "Delete $p? [ydN] " delete
+   [ "$delete" != "y" ] && [ "$delete" != "d" ] && continue
 
-   cd /"$(pkgutil --pkg-info $p | perl -ne '/^location: (.*)/ && print $1')"
-   echo $PWD
-   
+   DIR="/$(pkgutil --pkg-info $p | perl -ne '/^location: (.*)/ && print $1')"
+   echo cd '"'$DIR'"'
+   [ "$delete" == "y" ] && cd "$DIR"
+
    pkgutil --only-files --files $p | while read f
-				     do rm "$f" && echo $f
-				     done
+   do echo rm '"'$f'"'
+      [ "$delete" == "y" ] && rm "$f"
+   done
+
    pkgutil --only-dirs --files $p | while read d
-				    do rmdir -p "$d" 2>/dev/null && echo $d
-				    done
-   read -p "Forget $p? [yN] " yn
-   [ "$yn" == "y" ] && pkgutil --forget $p
+   do echo rmdir -p '"'$d'"'
+      [ "$delete" == "y" ] && rmdir -p "$d" 2>/dev/null
+   done
+
+   if [ "$delete" == "y" ]
+   then read -p "Forget $p? [yN] " forget
+        [ "$forget" == "y" ] && pkgutil --forget $p
+   fi
 done
